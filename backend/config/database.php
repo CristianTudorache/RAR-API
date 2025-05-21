@@ -1,13 +1,17 @@
 <?php
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
-$dotenv->load();
+$host = 'db'; // numele containerului db
+$db   = 'my_database';
+$user = 'postgres';
+$pass = 'postgres';
 
-return [
-    'driver'   => $_ENV['DB_DRIVER'] ?? 'pgsql',
-    'host'     => $_ENV['DB_HOST'] ?? 'localhost',
-    'port'     => $_ENV['DB_PORT'] ?? 5432,
-    'database' => $_ENV['DB_DATABASE'] ?? 'vehicledb',
-    'username' => $_ENV['DB_USERNAME'] ?? 'postgres',
-    'password' => $_ENV['DB_PASSWORD'] ?? 'postgres',
-];
+$dsn = "pgsql:host=$host;port=5432;dbname=$db";
+
+try {
+    $pdo = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ]);
+    return $pdo;
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}

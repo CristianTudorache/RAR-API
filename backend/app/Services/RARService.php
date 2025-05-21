@@ -1,24 +1,28 @@
 <?php
 
+namespace App\Services;
+
 class RARService {
-    public function send($vehicleData) {
-        // Simulam aici trimiterea catre RAR
-        $ch = curl_init('https://api.rar.mock/send');
+    public function send(array $vehicle): array {
+        // Aici în realitate folosim curl
+        // Ex: curl_exec($ch) sau $response = Http::post(...)
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($vehicleData));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Authorization: Bearer API_KEY'
-        ]);
+        // Simulăm un răspuns cu 90% șanse de succes - aleatoriu
+        // Facem asta pentru a simula un sistem functional
+        $success = rand(1, 10) <= 9;
 
-        // Simulam raspuns
-        $fakeResponse = [
-            'status' => 'aprobat',
-            'message' => 'Vehicul inregistrat cu succes la RAR'
-        ];
-
-        // In realitate ar arata ceva de genul: $response = curl_exec($ch)
-        return $fakeResponse;
+        if ($success) {
+            return [
+                'success' => true,
+                'message' => 'Vehicul trimis cu succes la RAR',
+                'vin' => $vehicle['vin'] ?? null
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Eroare la trimiterea către RAR',
+                'vin' => $vehicle['vin'] ?? null
+            ];
+        }
     }
 }

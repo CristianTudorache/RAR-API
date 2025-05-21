@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Dacă cererea nu este pentru un fișier/director existent
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirectează toate cererile către ../api/index.php
+RewriteRule ^ index.php [QSA,L]
