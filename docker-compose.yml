@@ -31,11 +31,11 @@ services:
       dockerfile: Dockerfile
     container_name: vue-app
     ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
+      - "5173:5173"
+    # volumes:
+    #   - ./frontend:/app
     working_dir: /app
-    command: npm run dev
+    command: ["npm", "run", "dev", "--", "--host"]
     depends_on:
       - backend
 
