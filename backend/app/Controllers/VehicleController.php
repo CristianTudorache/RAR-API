@@ -7,6 +7,7 @@ require_once __DIR__ . '/../Services/RARService.php';
 
 use App\Services\VehicleService;
 use App\Services\RARService;
+use App\Validators\VehicleValidator;
 
 class VehicleController {
 
@@ -19,18 +20,20 @@ class VehicleController {
 
     public function addVehicle($data) {
         $validator = new VehicleValidator();
-        if (!$validator->validate($data)) {
+        $errors = $validator->validate($data); // Use the validator's method
+        if (!empty($errors)) {
             http_response_code(400);
-            echo json_encode(['error' => 'Date invalide']);
-            return;
+            echo json_encode(['error' => 'Date invalide', 'details' => $errors]);
+            return $errors;
         }
-
-        $this->vehicleService->addToQueue($data['vin']); // doar vin, momentan
+    
+        $this->vehicleService->addToQueue($data); // doar vin, momentan
         echo json_encode(['success' => true]);
     }
 
     public function getQueue() {
-        $queue = $this->vehicleService->getPendingQueue();
+        // $queue = $this->vehicleService->getPendingQueue();
+        $queue = $this->vehicleService->getAllTest();
         echo json_encode([
             'success' => true,
             'queue_count' => count($queue),
@@ -48,8 +51,8 @@ class VehicleController {
             $response = $rar->send($vehicle);
 
             if ($response['success']) {
-                $this->vehicleService->markAsSent($vehicle['id']);
-                $sent[] = $vehicle['vin'];
+                $this->vehicleService->markAsSent($vehicle->id);
+                $sent[] = $vehicle->vin;
             }
         }
 

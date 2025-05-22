@@ -16,3 +16,12 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 
 # Copiem fișierele în container
 COPY . /var/www/html
+
+# Copiem scriptul de start
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+# Acordam permisiunile script-ului pentru a putea rula
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Setam entrypoint-ul
+ENTRYPOINT ["docker-entrypoint.sh"]

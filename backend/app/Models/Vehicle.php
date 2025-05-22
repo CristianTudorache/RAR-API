@@ -6,34 +6,50 @@ use PDO;
 
 class Vehicle {
     public $vin;
-    public $brand;
-    public $model;
-    public $year;
-    public $color;
-    private $pdo;
+    public $nrInmatriculare;
+    public $dataPrestatie;
+    public $obs;
+    public $odometruFinal;
+    public $odometruInitial;
+    public $prestatii;
+    public $sistemReparat;
+    public $status;
+    public $b64Image;
+
+    protected $pdo;
 
     public function __construct($data) {
         $this->vin = $data['vin'];
-        $this->brand = $data['brand'];
-        $this->model = $data['model'];
-        $this->year = $data['year'];
-        $this->color = $data['color'];
-
+        $this->nrInmatriculare = $data['nrInmatriculare'];
+        $this->dataPrestatie = $data['dataPrestatie'];
+        $this->obs = $data['obs'] ?? null;
+        $this->odometruFinal = $data['odometruFinal'] ?? null;
+        $this->odometruInitial = $data['odometruInitial'] ?? null;
+        $this->prestatii = $data['prestatii'];
+        $this->sistemReparat = $data['sistemReparat'] ?? null;
+        $this->status = $data['status'] ?? 'NEFINALIZATA';
+        $this->b64Image = $data['b64Image'] ?? null;
 
         $this->pdo = require __DIR__ . '/../../config/database.php';
     }
 
-    public function insertVehicle($vin, $data) {
+    public function insertVehicle() {
         $stmt = $this->pdo->prepare("
-            INSERT INTO vehicle_queue (vin, plate, prestare_id, data_prestare, status, created_at)
-            VALUES (:vin, :plate, :prestare_id, :data_prestare, 'pending', NOW())
+            INSERT INTO vehicle_queue (
+                vin, plate, data_prestare, status, odometru_initial, odometru_final, obs, created_at
+            ) VALUES (
+                :vin, :plate, :data_prestare, :status, :odometru_initial, :odometru_final, :obs, NOW()
+            )
         ");
 
         $stmt->execute([
-            ':vin' => $vin, 
-            ':plate' => $data['plate'],
-            ':prestare_id' => $data['prestare_id'],
-            ':data_prestare' => $data['data_prestare']
+            ':vin' => $this->vin,
+            ':plate' => $this->nrInmatriculare,
+            ':data_prestare' => $this->dataPrestatie,
+            ':status' => $this->status,
+            ':odometru_initial' => $this->odometruInitial,
+            ':odometru_final' => $this->odometruFinal,
+            ':obs' => $this->obs
         ]);
     }
 }
