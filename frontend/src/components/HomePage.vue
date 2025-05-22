@@ -16,7 +16,7 @@
 
     <!-- Preview imagine -->
     <div v-if="imagePreview" class="mb-3 col-md-6">
-      <img :src="imagePreview" alt="Preview imagine" style="max-width: 100%; height: auto; border: 1px solid #ccc;" />
+      <img :src="imagePreview" id="getImg" alt="Preview imagine" style="max-width: 100%; height: auto; border: 1px solid #ccc;" />
     </div>
 
 
@@ -35,10 +35,25 @@
         />
         </div>
 
+<!--data ascunsa -->
+         <div class="input-group mb-3">
+          
+          <input
+          id="getDataPrestatie"
+            style="display: none;"
+            type="text"
+             maxlength="7"
+            class="form-control"  
+            aria-describedby="dataasc"
+            v-model="dataAscunsa"
+          />
+        </div>
+
         <!-- Nr. înmatriculare -->
         <div class="input-group mb-3">
           <span class="input-group-text" id="basic-addon1">Nr. înmatriculare</span>
           <input
+          id="inputNrinmatriculare"
             ref="inputNrInmatriculare"
             type="text"
              maxlength="7"
@@ -52,14 +67,14 @@
         <small class="text-muted d-block text-center mb-3">Ex: GL12ABC – exact 7 caractere</small>
 
        <textarea
-  class="form-control mb-3"
-  id="exampleFormControlTextarea1"
-  rows="3"
-  maxlength="256"
-  placeholder="Observații"
-  v-model="observatii"
-   @input="autoResize"
-></textarea>
+          class="form-control mb-3"
+          id="getObservatii"
+          rows="3"
+          maxlength="256"
+          placeholder="Observații"
+          v-model="observatii"
+          @input="autoResize"
+        ></textarea>
 
          <small v-if="observatii.length < 256" class="text-muted d-block text-center mb-3">
     Mai trebuie să introduci {{ 256 - observatii.length }} caractere.
@@ -69,6 +84,7 @@
         <div class="input-group mb-3">
           <span class="input-group-text" id="labVin">VIN</span>
           <input
+            id="inputvin"
             ref="inputVIN"
             type="text"
             class="form-control"
@@ -87,7 +103,8 @@
 </small>
         <!-- Select prestație -->
         <div class="mb-3">
-          <select
+          <select 
+            id="selectPrestatii"
             v-model="selectedPrestatie"
             @change="adaugaPrestatie"
             class="form-select"
@@ -95,6 +112,7 @@
             <option disabled value="">Selectează prestația</option>
             <option
               v-for="opt in optPrestatii"
+              :id="opt.id"
               :key="opt.id"
               :value="opt.id"
               :class="{ 'text-danger': prestatiiSelectate.some(p => p.id === opt.id) }"
@@ -105,14 +123,19 @@
         </div>
 
         <!-- Prestații selectate -->
-        <div class="mb-3">
+        <div class="mb-3 getallInterv" id="getInterventi">
           <h6 class="mb-2">Prestații alese:</h6>
-          <div v-for="(item, index) in prestatiiSelectate" :key="item.id" class="mb-2">
+          <div v-for="(item, index) in prestatiiSelectate" :id="item.id" :key="item.id" class="mb-2">
             <div class="d-flex justify-content-between align-items-center border rounded p-2 bg-light">
-              <div>{{ item.numePrestatie }}</div>
-              <button class="btn btn-sm btn-outline-danger" @click="stergePrestatie(index)">
-                ✖
-              </button>
+              <div  :id="'getIntNume-' + item.numePrestatie" >{{ item.numePrestatie }}</div>
+             <button
+
+            :id="'stergePrest-' + item.id" 
+              class="btn btn-sm btn-outline-danger remove-prestatie-btn"
+              @click="stergePrestatie(index)"
+            >
+  ✖
+</button>
             </div>
           </div>
         </div>
@@ -123,7 +146,7 @@
             type="number"
             ref="odomInit"
             class="form-control"
-            id="exampleFormControlInput1"
+            id="getOdomInit"
             placeholder="Odometru initial"
             v-model="odometruInit"
           />
@@ -131,9 +154,9 @@
 
           <input
             type="number"
-             ref="odomFin"
+            ref="odomFin"
             class="form-control"
-            id="exampleFormControlInput1"
+            id="getOdomFin"
             placeholder="Odometru final"
             v-model="odometruFinal"
           />
@@ -148,7 +171,9 @@
         <div class="d-grid gap-2">
           <button
             type="button"
+            
             class="btn btn-secondary"
+            id="btnTrimiteFormular"
             @click="sendToRar"
           >
             Trimite
@@ -170,12 +195,13 @@ export default {
       imagePreview: null,
       b64Image: "", // aici vom ține stringul base64
       nrInmatriculare: '',
+      dataAscunsa:'',
       selectedDateString: new Date().toISOString().slice(0, 10),
       minDate: new Date().toISOString().slice(0, 10),
       vin: '',
       isValid:false,
       odometruInit: '',
-      odometruFinal: 9999999,
+      odometruFinal: '',
       isHidden:false,
       observatii: '',
       selectedPrestatie: '',
@@ -203,6 +229,12 @@ export default {
     };
   },
 
+computed: {
+  dataAscunsa() {
+    return this.selectedDateString;
+  }
+},
+
   watch: {
   nrInmatriculare(value) {
     this.nrInmatriculare = value.toUpperCase().trim();
@@ -210,6 +242,9 @@ export default {
    vin(value) {
     this.vin = value.toUpperCase().trim();
   },
+   selectedDateString(newVal) {
+    this.dataAscunsa = newVal;
+  }
 
   /*
   odometruFinal(value){
@@ -301,7 +336,7 @@ export default {
 
   if (idSters === 'R-ODO' || idSters === 'I-ODO') {
     this.odometruInit = '';
-    this.odometruFinal='9999999';
+    this.odometruFinal='';
   }
 
   const maiExista = this.prestatiiSelectate.some(p =>
@@ -332,7 +367,7 @@ export default {
     });
     return false;
   }
-
+/*
 if(this.odometruFinal<this.odometruInit){
    Swal.fire({
       icon: 'warning',
@@ -343,6 +378,7 @@ if(this.odometruFinal<this.odometruInit){
     return false;
 
 }
+    */
         //  alert("salveaza");
         //console.log("salveaza");
 
@@ -359,7 +395,7 @@ if(this.odometruFinal<this.odometruInit){
       let dataToServer;
 
           dataToServer = {
-            'dataPrestatie': this.selectedDateString,
+            'dataPrestatie': this.dataAscunsa,
             'nrInmatriculare': this.nrInmatriculare,
             'obs':this.observatii,
             'odometruFinal': this.odometruFinal,
