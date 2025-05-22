@@ -4,19 +4,40 @@ services:
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
+    container_name: php-app
+    ports:
+      - "8000:80"
     volumes:
       - ./backend:/var/www/html
-    working_dir: /var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: my_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     ports:
-      - "8000:8000"
-    command: php -S 0.0.0.0:8000 -t public
+      - "5432:5432"
 
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vue-app
+    ports:
+      - "3000:3000"
     volumes:
       - ./frontend:/app
     working_dir: /app
-    ports:
-      - "3000:3000"
     command: npm run dev
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
