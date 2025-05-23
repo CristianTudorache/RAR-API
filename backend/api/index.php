@@ -1,10 +1,15 @@
 <?php
+// Permite toate originile (doar pentru dezvoltare locală! - vulnerabilitate ridicata), se comenteaza/sterg liniile in productie
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE");
 
 require_once __DIR__ . '/../app/Controllers/VehicleController.php';
 
 $uri = $_SERVER['REQUEST_URI'];
 $method = $_SERVER['REQUEST_METHOD'];
 $requestBody = file_get_contents('php://input');
+file_put_contents('log.txt', file_get_contents("php://input"));
 //debug
 var_dump($requestBody);
 $data = json_decode($requestBody);

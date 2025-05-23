@@ -148,7 +148,7 @@
             class="form-control"
             id="getOdomInit"
             placeholder="Odometru initial"
-            v-model="odometruInit"
+            v-model.number="odometruInitial"
           />
 
 
@@ -158,7 +158,7 @@
             class="form-control"
             id="getOdomFin"
             placeholder="Odometru final"
-            v-model="odometruFinal"
+            v-model.number="odometruFinal"
           />
 
           
@@ -200,7 +200,7 @@ export default {
       minDate: new Date().toISOString().slice(0, 10),
       vin: '',
       isValid:false,
-      odometruInit: '',
+      odometruInitial: '',
       odometruFinal: '',
       isHidden:false,
       observatii: '',
@@ -231,8 +231,16 @@ export default {
 
 computed: {
   dataAscunsa() {
+  if (this.selectedDateString && this.selectedDateString.trim() !== "") {
     return this.selectedDateString;
+  } else {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
+}
 },
 
   watch: {
@@ -335,8 +343,8 @@ computed: {
   this.prestatiiSelectate.splice(index, 1);
 
   if (idSters === 'R-ODO' || idSters === 'I-ODO') {
-    this.odometruInit = '';
-    this.odometruFinal='';
+    this.odometruInitial = 0;
+    this.odometruFinal = 0;
   }
 
   const maiExista = this.prestatiiSelectate.some(p =>
@@ -345,7 +353,7 @@ computed: {
   this.isHidden = maiExista;
 
   if (!maiExista) {
-    this.odometruInit = '';
+    this.odometruInitial = 0;
   }
 }
 ,
@@ -399,17 +407,17 @@ if(this.odometruFinal<this.odometruInit){
             'nrInmatriculare': this.nrInmatriculare,
             'obs':this.observatii,
             'odometruFinal': this.odometruFinal,
-            'odometruInitial': this.odometruInit,
+            'odometruInitial': this.odometruInitial,
             'prestatii': prestatiiTrimise,
             'sistemReparat':null,
-            'status':'FINALIZATA',
+            'status':'IN ASTEPTARE',
             'vin':this.vin,
             'b64Image': this.b64Image || "",
         }
 
         console.log("obiectul trimis la server" + JSON.stringify(dataToServer));
 
-          axios.post('/api/vehicles/add', dataToServer)
+          axios.post('http://localhost:8000/api/vehicles/add', dataToServer)
                .then(function(response) {
                
                 console.log("apeleaza cart store",response.data);
@@ -495,35 +503,31 @@ if(this.odometruFinal<this.odometruInit){
       if(this.isHidden==true){
 
 
-        if(this.odometruInit=='' ){
+        if (this.odometruInitial === null || this.odometruInitial === undefined || isNaN(this.odometruInitial)) {
             Swal.fire({
-                  icon: 'warning',
-                  title: 'Atentie!',
-                  text: 'Introduceti odometru initial  !',
-                }).then(() => {
-                  this.$refs.odomInit.focus();
-              });
-                
-              isValid=false;
-             return false;
+              icon: 'warning',
+              title: 'Atentie!',
+              text: 'Introduceți odometrul initial!',
+            }).then(() => {
+              this.$refs.odomInit.focus();
+            });
 
-         }
+            isValid = false;
+          return false;
+        }
 
-         if(this.odometruFinal=='' ){
+         if (this.odometruFinal === null || this.odometruFinal === undefined || isNaN(this.odometruFinal)) {
             Swal.fire({
-                  icon: 'warning',
-                  title: 'Atentie!',
-                  text: 'Introduceti odometru final  !',
-                }).then(() => {
-                  this.$refs.odomFin.focus();
-              });
-                
-              isValid=false;
-             return false;
+              icon: 'warning',
+              title: 'Atentie!',
+              text: 'Introduceți odometrul final!',
+            }).then(() => {
+              this.$refs.odomFin.focus();
+            });
 
-         }
-
-
+            isValid = false;
+          return false;
+        }
 
       }
     
