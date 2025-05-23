@@ -9,8 +9,9 @@ Am inițiat organizarea acestui repo și setup-ul de bază pentru colaborare.
 
 ## Pentru rularea aplicatiei foloseste:
  
+    
     ```bash
-        docker compose up --build
+    docker compose up --build
     ```
 
 ### Ce am făcut la inceput
