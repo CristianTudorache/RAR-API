@@ -45,7 +45,7 @@
              maxlength="7"
             class="form-control"  
             aria-describedby="dataasc"
-            v-model="dataAscunsa"
+            v-model="formattedDate"
           />
         </div>
 
@@ -200,8 +200,8 @@ export default {
       minDate: new Date().toISOString().slice(0, 10),
       vin: '',
       isValid:false,
-      odometruInitial: '',
-      odometruFinal: '',
+      odometruInitial: 0,
+      odometruFinal: 0,
       isHidden:false,
       observatii: '',
       selectedPrestatie: '',
@@ -230,17 +230,9 @@ export default {
   },
 
 computed: {
-  dataAscunsa() {
-  if (this.selectedDateString && this.selectedDateString.trim() !== "") {
-    return this.selectedDateString;
-  } else {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
+  formattedDate() {
+    return this.selectedDateString || new Date().toISOString().slice(0, 10);
   }
-}
 },
 
   watch: {
@@ -354,86 +346,45 @@ computed: {
 
   if (!maiExista) {
     this.odometruInitial = 0;
+    this.odometruFinal = 0;
   }
 }
 ,
-    sendToRar() {
-     
+sendToRar() {
+  this.isValid = this.valideazaCampuri();
 
-      this.isValid=this.valideazaCampuri();
+  if (!this.isValid) return;
 
-      if (!this.isValid) {
-    // dacă campurile nu sunt valide, oprește și nu verifica prestațiile încă
-    return false;
-  }
+  const prestatiiTrimise = this.prestatiiSelectate.map(item => ({
+    codPrestatie: item.id,
+    numePrestatie: item.numePrestatie,
+    idPrezentare: null
+  }));
 
-     if(this.prestatiiSelectate.length === 0) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Atenție',
-      text: 'Selectați o intervenție din listă!',
+  const dataToServer = {
+    dataPrestatie: this.formattedDate,
+    nrInmatriculare: this.nrInmatriculare,
+    obs: this.observatii,
+    prestatii: prestatiiTrimise,
+    status: 'IN ASTEPTARE',
+    vin: this.vin,
+    b64Image: this.b64Image || "",
+    odometruInitial: this.isHidden ? this.odometruInitial : 0,
+    odometruFinal: this.isHidden ? this.odometruFinal : 0
+  };
+
+  console.log("obiectul trimis la server", JSON.stringify(dataToServer));
+
+  axios.post('http://localhost:8000/api/vehicles/add', dataToServer)
+    .then(response => {
+      console.log("apeleaza cart store", response.data);
+      alert("Salvat cu succes");
+    })
+    .catch(err => {
+      console.error("Eroare la salvare:", err);
+      this.loading = false;
     });
-    return false;
-  }
-/*
-if(this.odometruFinal<this.odometruInit){
-   Swal.fire({
-      icon: 'warning',
-      title: 'Atenție',
-      text: 'Valoare odometru final trebuie sa mie mai mare sau egala cu valoare odometru initial !',
-    });
-
-    return false;
-
-}
-    */
-        //  alert("salveaza");
-        //console.log("salveaza");
-
-     //    console.log("prestatie este", JSON.stringify(this.prestatiiSelectate));
-
-    const prestatiiTrimise = this.prestatiiSelectate.map(item => ({
-          codPrestatie: item.id,
-          numePrestatie:item.numePrestatie,
-          idPrezentare: null
-        }));
-
-      console.log("prestatie este", prestatiiTrimise);
-
-      let dataToServer;
-
-          dataToServer = {
-            'dataPrestatie': this.dataAscunsa,
-            'nrInmatriculare': this.nrInmatriculare,
-            'obs':this.observatii,
-            'odometruFinal': this.odometruFinal,
-            'odometruInitial': this.odometruInitial,
-            'prestatii': prestatiiTrimise,
-            'sistemReparat':null,
-            'status':'IN ASTEPTARE',
-            'vin':this.vin,
-            'b64Image': this.b64Image || "",
-        }
-
-        console.log("obiectul trimis la server" + JSON.stringify(dataToServer));
-
-          axios.post('http://localhost:8000/api/vehicles/add', dataToServer)
-               .then(function(response) {
-               
-                console.log("apeleaza cart store",response.data);
-                
-                alert("salvat cu succes");
-
-
-            })
-               .catch(function(response) {
-                self.loading = false;
-            })
-
-      
-
-     
-    },
+},
 
      valideazaCampuri(){
 
@@ -530,12 +481,7 @@ if(this.odometruFinal<this.odometruInit){
         }
 
       }
-    
-
       return isValid;
-
-      
-
     }
   }
 };

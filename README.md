@@ -7,11 +7,47 @@
 Acest document va fi actualizat pe parcurs pe măsură ce avansăm cu proiectul.  
 Am inițiat organizarea acestui repo și setup-ul de bază pentru colaborare.  
 
-### Ce am făcut până acum
+## Pentru rularea aplicatiei foloseste:
+ 
+    ```bash
+        docker compose up --build
+    ```
+
+### Ce am făcut la inceput
 
 - Am clonat repository-ul și am creat branch-uri individuale pentru fiecare dintre noi, în formatul `feature/nume`.
 - Am stabilit un workflow simplu de lucru cu git: branch-uri separate pentru fiecare, branch `dev` pentru integrare și `main` pentru versiune stabilă.
 - Am pregătit pașii inițiali pentru colaborare în echipă și gestionarea codului.
+
+## Ce am realizat până acum ca si echipa
+
+- Am containerizat ambele aplicații — backend-ul PHP și frontend-ul Vue.js — în containere separate, orchestrate eficient cu un fișier **docker-compose.yml**.  
+Aceasta asigură un mediu consistent, ușor de pornit și scalabil.
+
+- Am respectat **best practices** în scrierea codului și gestionarea versiunilor pe Git, folosind branch-uri dedicate, commit-uri clare și un workflow simplu pentru colaborare.
+
+- Am optimizat validările input-urilor în frontend, pentru a preveni trimiterea de date invalide și pentru a oferi feedback clar utilizatorului.
+
+- Am implementat o validare riguroasă în backend la primirea datelor, pregătind arhitectura pentru integrarea cu platforma RAR, cu atenție la consistența și securitatea informațiilor.
+
+- Am creat script-uri și entrypoint-uri Docker pentru a putea porni toată soluția dintr-o singură comandă în terminal (`docker-compose up`), facilitând dezvoltarea și testarea locală.
+
+- Am separat clar logica de cod pe directoare și module, pentru a avea un proiect scalabil, ușor de înțeles și de extins pe viitor.
+
+- Am configurat baza de date astfel încât să stocheze toate vehiculele care trebuie trimise către RAR într-un tabel **vehicle_queue**, facilitând managementul cozii de procesare.
+
+- Am simulat un **cronjob** intern care procesează această coadă, trimițând către RAR un număr limitat (maxim 10) de inserții pe minut, respectând astfel cerințele proiectului.
+
+---
+
+## Observații finale
+
+Există cu siguranță zone unde soluția poate fi îmbunătățită și optimizată (ex: extinderea testelor automate, tratarea mai complexă a erorilor, o interfață de administrare mai detaliată).  
+Din cauza constrângerilor de timp, am prioritizat implementarea funcționalităților de bază, pentru a avea un MVP stabil și funcțional.  
+
+## Video cu aplicatia si metoda de rulare: 
+https://vladspace.s3.eu-central-1.amazonaws.com/proof_of_work.mov
+
 
 ### Cum lucrăm
 
@@ -108,15 +144,7 @@ Responsabil de testarea funcționalității și generarea datelor pentru simular
 - Posibilitatea de a adăuga un tabel de tip admin UI pentru vizualizarea statusului joburilor (Pending / Success / Failed).
 - Testarea diverselor scenarii de edge-case (ex: coduri greșite, câmpuri lipsă) și suport în integrarea cu backend-ul.
 
-
-## Propunere sistem functionare aplicatie
-
-- Repo-ul va conține două directoare principale: /backend (PHP API) și /frontend (Vue.js UI).
-- Aplicația poate fi rulată local prin Docker, cu containere separate pentru backend și frontend.
-- Un docker-compose.yml va orchestra containerele astfel încât frontend-ul să comunice corect cu backend-ul, gestionând automat rețeaua și porturile.
-- Backend-ul PHP va expune endpoint-ul /api/prezentari, iar frontend-ul Vue.js va face apeluri către acest endpoint prin configurația internă Docker.
-- Pentru testare, echipa tehnică va putea porni aplicația cu o singură comandă (docker-compose up), având mediul complet izolat și configurat corect.
-- Această abordare asigură consistență între medii (dezvoltare, testare, producție) și elimină problemele de configurare locală.
+---
 
 Mult succes tuturor!  
 Vlad

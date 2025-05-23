@@ -26,7 +26,7 @@ class VehicleValidator {
             $errors[] = 'Odometrul inițial trebuie să fie numeric.';
         }
 
-        if (isset($data->odometruFinal) && !is_string($data->odometruFinal)) {
+        if (isset($data->odometruFinal) && !is_numeric($data->odometruFinal)) {
             $errors[] = 'Odometrul final trebuie să fie numeric.';
         }
 
