@@ -8,11 +8,9 @@ Acest document va fi actualizat pe parcurs pe măsură ce avansăm cu proiectul.
 Am inițiat organizarea acestui repo și setup-ul de bază pentru colaborare.  
 
 ## Pentru rularea aplicatiei foloseste:
- 
-    
-    ```bash
+
     docker compose up --build
-    ```
+
 
 ### Ce am făcut la inceput
 
